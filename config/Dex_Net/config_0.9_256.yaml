@@ -1,0 +1,30 @@
+llm:
+  api_key: "YOUR_API_KEY"
+  base_url: "https://api.openai.com/v1"
+  role_prompt: "You are an expert in robotic grasp assessment."
+run:
+  prepare: true  # true 执行数据清洗，false 跳过
+  runs: 5      # 评估循环次数
+  max_workers: 5
+
+generation:
+  model: "gpt-4o"
+  prompt_template: "Examine the 32 x 32 single‑channel depth map, describe this image in natural language:"
+  validation_threshold: 0
+  max_attempts: 5
+  max_workers: 351
+  max_tokens: 256
+  temperature: 0.9
+
+evaluation:
+  model: "gpt-4o"#
+  #prompt: "You are a senior robotic manipulation engineer specializing in parallel‑jaw grasp planning. Answer: yes or no. Then explain the reasons for the answer."
+  prompt: "You are a senior robotic manipulation engineer specializing in parallel‑jaw grasp planning. Answer: yes or no. Then provide a step-by-step reasoning process."
+  temperature: 0.0
+  is_classification: True
+
+paths:
+  main_dir: "datasets/Dex_Net/gpt-4o/abl/t/0.9"
+  raw_data: "raw_data.csv"
+  clean_data: "clean_data.csv"
+  result: "result.csv"

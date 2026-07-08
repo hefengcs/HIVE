@@ -1,0 +1,29 @@
+llm:
+  api_key: "YOUR_API_KEY"
+  base_url: "https://api.openai.com/v1"
+  role_prompt: "You are a reason expert."
+run:
+  prepare: true  # true 执行数据清洗，false 跳过
+  runs: 10     # 评估循环次数
+  max_workers: 10
+
+generation:
+  model: "gpt-4o"
+  prompt_template: "Describe this image in natural language. Provide a creative interpretation, including potential implications. Feel free to make reasonable inferences beyond just what you directly see."
+  validation_threshold: 0
+  max_attempts: 10
+  max_workers: 200
+  max_tokens: 256
+  temperature: 0.6
+
+evaluation:
+  model: "gpt-4o"#
+  prompt: "You are a visual reasoning expert. Answer the question based on the image. Answer: yes or no. Then provide a step-by-step reasoning process."
+  temperature: 0.0
+  is_classification: True
+
+paths:
+  main_dir: "datasets/GQA/new_prmopt_H"
+  raw_data: "raw_data.csv"
+  clean_data: "clean_data.csv"
+  result: "result.csv"

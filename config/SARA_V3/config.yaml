@@ -1,0 +1,30 @@
+llm:
+  api_key: "YOUR_API_KEY"
+  base_url: "https://api.openai.com/v1"
+  role_prompt: "You are a legal expert."
+run:
+  prepare: true  # true 执行数据清洗，false 跳过
+  runs: 10      # 评估循环次数
+  max_workers: 10
+
+generation:
+  model: "gpt-4o"
+  #prompt_template: "{Sign}\n Describe this in natural language:"
+  prompt_template: "{Sign}\n Describe this in natural language. Include potential implications. Feel free to make reasonable inferences beyond just the stated facts."
+  validation_threshold: 0
+  max_attempts: 10
+  max_workers: 200
+  max_tokens: 256
+  temperature: 0.6
+
+evaluation:
+  model: "gpt-4o"#
+  prompt: "You are a legal reasoning assistant.\n Determine whether the following legal claim is supported by the facts. Answer: yes or no. Then provide a step-by-step reasoning process."
+  temperature: 0.0
+  is_classification: True
+
+paths:
+  main_dir: "datasets/sara_v3/new_caption/new_prmopt"
+  raw_data: "raw_data.csv"
+  clean_data: "clean_data.csv"
+  result: "result.csv"

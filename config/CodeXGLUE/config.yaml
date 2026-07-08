@@ -1,0 +1,29 @@
+llm:
+  api_key: "YOUR_API_KEY"
+  base_url: "https://api.openai.com/v1"
+  role_prompt: "You are a software security expert and professor. "
+
+run:
+  prepare: false   # true 执行数据清洗，false 跳过
+  runs: 10        # 评估循环次数
+  max_workers: 10
+generation:
+  model: "gpt-4o"
+  prompt_template: "{Sign}\n Describe this in natural language:"
+  validation_threshold: 0
+  max_attempts: 20
+  max_workers: 200
+  max_tokens: 256
+  temperature: 0.6
+
+evaluation:
+  model: "gpt-4o"#
+  prompt: "You are a software security expert and professor. Does the following C function contain a security vulnerability? Answer: yes or no. Then provide a step-by-step reasoning process."
+  temperature: 0.0
+  is_classification: True
+
+paths:
+  main_dir: "datasets/CodeXGLUE/new_caption"
+  raw_data: "raw_data.csv"
+  clean_data: "clean_data.csv"
+  result: "result.csv"

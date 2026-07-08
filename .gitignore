@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+.venv/
+venv/
+
+# Secrets
+.env
+api.config
+config/gpt_api.py
+
+# Data and generated outputs
+datasets/
+results/
+writing_results/
+rebuttal_results/
+*.log
+
+# Large artifacts
+*.zip
+*.tgz
+*.tar
+*.tar.gz
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.npy
+*.npz
+*.h5
+*.hdf5
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/

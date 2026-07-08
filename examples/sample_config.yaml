@@ -1,0 +1,30 @@
+llm:
+  api_key: "YOUR_API_KEY"
+  base_url: "https://api.openai.com/v1"
+  role_prompt: "You are a careful evaluator."
+
+run:
+  prepare: false
+  runs: 1
+  max_workers: 1
+
+generation:
+  model: "gpt-4o"
+  prompt_template: "Describe this input in natural language: {Sign}"
+  validation_threshold: 0
+  max_attempts: 5
+  max_workers: 4
+  max_tokens: 256
+  temperature: 0.6
+
+evaluation:
+  model: "gpt-4o"
+  prompt: "Answer yes or no, then briefly explain your reasoning."
+  temperature: 0.0
+  is_classification: true
+
+paths:
+  main_dir: "examples/data"
+  raw_data: "sample_raw_data.csv"
+  clean_data: "sample_clean_data.csv"
+  result: "result.csv"
