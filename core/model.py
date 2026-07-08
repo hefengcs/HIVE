@@ -359,7 +359,7 @@ class TaskAwareController(LLM_Context):
         )
         return self.generate_response(prompt)
 
-class HALOSystemPipeline:
+class HIVEPipeline:
     def __init__(self, model="gpt-3.5-turbo"):
         self.generator = DualPathGenerator(model=model)
         self.classifier = HallucinationClassifier(model=model)
@@ -438,7 +438,7 @@ class TaskAwareControllerWithFusion(TaskAwareController):
         )
         return self.generate_response(prompt)
 
-class HALOSystemPipelineWithFusion(HALOSystemPipeline):
+class HIVEPipelineWithFusion(HIVEPipeline):
     def __init__(self, model="gpt-3.5-turbo"):
         super().__init__(model=model)
         self.generator_with_fusion = DualPathGeneratorWithFusion(model=model)

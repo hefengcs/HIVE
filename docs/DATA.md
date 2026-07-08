@@ -1,6 +1,6 @@
 # Data Format
 
-HALO expects CSV files. The public repository does not redistribute benchmark data or generated results.
+HIVE expects CSV files. The public repository does not redistribute benchmark data or generated results.
 
 ## Raw Input
 
@@ -17,10 +17,10 @@ For evaluation without running generation, provide:
 - `Sign`
 - `Label`
 - `caption_H`
-- `caption_NH`
+- `caption_F`
 - `Path`, optional
 
-`caption_H` is the hallucinated description. `caption_NH` is the non-hallucinated description.
+`caption_H` is the hallucinated caption (`C_H`). `caption_F` is the faithful caption (`C_F`). Older files using `caption_NH` are still accepted as a faithful-caption alias.
 
 ## Dataset Policy
 

@@ -9,9 +9,9 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from core.model import LLM_Context
 from data.data_prepare.data_prepare_pipeline import run_pipeline
 from core.evalute_pipeline import evaluate_gpt_predictions
-from analysis.csv_analysis.csv_analyze_from_subdir import filter_caption_H_success_cases
+from analysis.csv_analysis.csv_analyze_from_subdir import filter_hallucination_gain_cases
 
-"""hallucination_pipeline.py
+"""hive_pipeline.py
 
 Features
 --------
@@ -31,7 +31,7 @@ run:
 Usage
 -----
 ```bash
-python hallucination_pipeline.py --config config/AntiCP2/config.yaml
+python main.py --config examples/sample_config.yaml
 ```
 """
 
@@ -111,13 +111,13 @@ def evaluate_once(run_id: int, cfg: dict, clean_data_path: str, main_dir: str) -
         final_dir += "_" + datetime.now().strftime("%Y%m%d%H%M%S")
     os.rename(run_dir, final_dir)
 
-    # --- Post-processing: filter rows where H wins over NH ---
+    # --- Post-processing: filter rows where the hallucinated path beats the faithful path ---
     result_csv = os.path.join(final_dir, cfg["paths"]["result"])
     if os.path.exists(result_csv):
         try:
-            filter_caption_H_success_cases(result_csv)
+            filter_hallucination_gain_cases(result_csv)
         except Exception as e:
-            print(f"⚠️  H-wins filter skipped for run {run_id:02d}: {e}")
+            print(f"⚠️  H-F gain filter skipped for run {run_id:02d}: {e}")
 
     return final_name
 

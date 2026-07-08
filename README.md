@@ -1,20 +1,20 @@
-# HALO
+# HIVE
 
-Official implementation of HALO, a framework for generating and evaluating hallucinated and non-hallucinated contextual descriptions for model robustness analysis.
+Official implementation of **HIVE: Understanding Post-Hallucination Reasoning in Vision Language Models**.
 
-This repository contains the public research code for running the HALO data preparation and evaluation pipeline. Dataset files, generated results, review materials, and local model checkpoints are intentionally not included.
+HIVE, short for **Hallucination Inference and Verification Engine**, is an evaluation infrastructure for studying **Post-Hallucination Reasoning (PHR)**: the stage where hallucinated semantics enter a model's inference context and influence downstream predictions. Dataset files, generated results, review materials, and local model checkpoints are intentionally not included.
 
 ## Installation
 
 ```bash
 git clone <repo-url>
-cd HALO
+cd HIVE
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-HALO uses OpenAI-compatible chat completion APIs. Set credentials through environment variables:
+HIVE uses OpenAI-compatible chat completion APIs. Set credentials through environment variables:
 
 ```bash
 export OPENAI_API_KEY="your_api_key"
@@ -29,9 +29,11 @@ Prepare a CSV with at least these columns:
 
 - `Sign`: the statement or claim to evaluate.
 - `Label`: binary ground-truth label, where `1` corresponds to "yes" and `0` corresponds to "no".
-- `caption_H`: hallucinated context.
-- `caption_NH`: non-hallucinated context.
+- `caption_H`: hallucinated caption, denoted as `C_H` in the paper.
+- `caption_F`: faithful caption, denoted as `C_F` in the paper.
 - `Path`: optional image path for multimodal evaluation.
+
+For backward compatibility, older CSV files with `caption_NH` are also accepted as faithful captions.
 
 Then run:
 
@@ -43,12 +45,13 @@ The sample config points to `examples/data/sample_clean_data.csv`. It is intende
 
 ## Pipeline
 
-HALO has two main stages:
+HIVE has three main modules:
 
-1. Data preparation: generate hallucinated (`caption_H`) and non-hallucinated (`caption_NH`) descriptions, then validate them with checker modules.
-2. Evaluation: compare model behavior under statement-only, non-hallucinated-context, and hallucinated-context settings.
+1. Caption Generator: generate candidate captions from a unified source.
+2. Caption Discriminator: separate faithful (`caption_F`) and hallucinated (`caption_H`) captions.
+3. Task Solver: compare downstream predictions under raw, faithful-caption, and hallucinated-caption settings.
 
-Set `run.prepare: true` in a YAML config to run the preparation stage from raw data. Set it to `false` when `clean_data.csv` already contains `caption_H` and `caption_NH`.
+Set `run.prepare: true` in a YAML config to run the preparation stage from raw data. Set it to `false` when `clean_data.csv` already contains `caption_H` and `caption_F`.
 
 ## Configuration
 
@@ -65,7 +68,7 @@ For public use, prefer environment variables for credentials. If `llm.api_key` i
 ## Repository Structure
 
 ```text
-core/                 Core LLM wrapper, HALO checkers, and evaluation logic.
+core/                 Core LLM wrapper, HIVE checkers, and evaluation logic.
 data/data_prepare/    Caption generation and validation pipeline.
 data/dataset_format/  Dataset conversion helpers.
 analysis/             Lightweight post-processing utilities used by main.py.
@@ -81,9 +84,9 @@ Datasets are not redistributed in this repository. Download each benchmark from 
 ## Citation
 
 ```bibtex
-@inproceedings{halo2026,
-  title = {HALO},
-  author = {HALO Authors},
+@inproceedings{hive2026,
+  title = {HIVE: Understanding Post-Hallucination Reasoning in Vision Language Models},
+  author = {He, Feng and Wang, Zhenting and Wang, Qifan and Guan, Qiang and Liu, Dongfang and Tang, Ruixiang and Li, Qiankun},
   booktitle = {To appear},
   year = {2026}
 }

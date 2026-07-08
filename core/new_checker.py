@@ -144,4 +144,4 @@ class ParaphraseConsistencyJudge:
 
 
 if __name__ == "__main__":
-    print("Use `python main.py --config <config.yaml>` to run the HALO pipeline.")
+    print("Use `python main.py --config <config.yaml>` to run the HIVE pipeline.")

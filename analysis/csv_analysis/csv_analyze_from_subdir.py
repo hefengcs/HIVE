@@ -1,32 +1,37 @@
 import pandas as pd
 import os
 
-def filter_caption_H_success_cases(input_csv, output_csv=None):
+def filter_hallucination_gain_cases(input_csv, output_csv=None):
     """
-    筛选 caption_H 预测正确而 caption_NH 预测错误的样本（H wins over NH）。
+    Filter samples where the hallucinated-caption path is correct and the
+    faithful-caption path is incorrect, i.e. positive Delta(H-F) cases.
 
-    参数:
-        input_csv (str): 输入预测结果的 CSV 文件路径
-        output_csv (str, optional): 如果未指定，自动在同目录生成 result_H_wins.csv
+    Args:
+        input_csv: Prediction CSV path.
+        output_csv: Optional output path. Defaults to result_HF_gain.csv.
 
-    返回:
-        pd.DataFrame: 筛选后的 DataFrame
+    Returns:
+        Filtered DataFrame.
     """
 
     if output_csv is None:
-        output_csv = os.path.join(os.path.dirname(input_csv), "result_H_wins.csv")
+        output_csv = os.path.join(os.path.dirname(input_csv), "result_HF_gain.csv")
 
     try:
         df = pd.read_csv(input_csv)
     except UnicodeDecodeError:
         df = pd.read_csv(input_csv, encoding='ISO-8859-1')
 
+    faithful_pred_col = "Prediction_caption_F"
+    if faithful_pred_col not in df.columns and "Prediction_caption_NH" in df.columns:
+        faithful_pred_col = "Prediction_caption_NH"
+
     filtered_df = df[
-        (df['Prediction_caption_H'] == df['Label']) &
-        (df['Prediction_caption_NH'] != df['Label'])
+        (df["Prediction_caption_H"] == df["Label"]) &
+        (df[faithful_pred_col] != df["Label"])
     ]
 
-    print(f"H wins over NH: {len(filtered_df)} / {len(df)} samples")
+    print(f"H-F gain cases: {len(filtered_df)} / {len(df)} samples")
     filtered_df.to_csv(output_csv, index=False)
     print(f"Saved → {output_csv}")
 
@@ -34,5 +39,4 @@ def filter_caption_H_success_cases(input_csv, output_csv=None):
 
 
 if __name__ == "__main__":
-    # 示例调用
-    filter_caption_H_success_cases("datasets/dataset_debug/results/result.csv")
+    print("Use `python main.py --config <config.yaml>` to run the HIVE pipeline.")

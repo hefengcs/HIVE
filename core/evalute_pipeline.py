@@ -11,12 +11,13 @@ from core.model import LLM_Context
 
 
 def evaluate_gpt_predictions(input_csv, llm_context: LLM_Context, base_prompt, output_dir,
-                              eval_modes=("sign_only", "caption_NH", "caption_H")):
+                              eval_modes=("sign_only", "caption_F", "caption_H")):
     """
     eval_modes: which evaluation paths to run.
         - "sign_only":  Statement only, no caption
-        - "caption_NH": Statement + non-hallucinated caption
+        - "caption_F":  Statement + faithful caption
         - "caption_H":  Statement + hallucinated caption
+    Legacy CSV files that use caption_NH are accepted as faithful-caption inputs.
     Returns a tuple of accuracies in the order given by eval_modes.
     """
     df = pd.read_csv(input_csv, encoding="latin1")
@@ -50,7 +51,13 @@ def evaluate_gpt_predictions(input_csv, llm_context: LLM_Context, base_prompt, o
         reasoning, pred = ask_gpt(prompt,image_path)
         return i, sign, pred, reasoning
 
+    def resolve_description_col(description_col):
+        if description_col == "caption_F" and description_col not in df.columns and "caption_NH" in df.columns:
+            return "caption_NH"
+        return description_col
+
     def evaluate_all(description_col):
+        description_col = resolve_description_col(description_col)
         results = [None] * len(df)
         reasonings = [None] * len(df)
         signs = [None] * len(df)
@@ -83,7 +90,8 @@ def evaluate_gpt_predictions(input_csv, llm_context: LLM_Context, base_prompt, o
 
     MODE_SPEC = {
         "sign_only":  ("",           "Sign only",         "Prediction_Sign_only",   "Reasoning_Sign_only"),
-        "caption_NH": ("caption_NH", "Sign + caption_NH", "Prediction_caption_NH",  "Reasoning_caption_NH"),
+        "caption_F":  ("caption_F",  "Sign + caption_F",  "Prediction_caption_F",   "Reasoning_caption_F"),
+        "caption_NH": ("caption_F",  "Sign + caption_F",  "Prediction_caption_F",   "Reasoning_caption_F"),
         "caption_H":  ("caption_H",  "Sign + caption_H",  "Prediction_caption_H",   "Reasoning_caption_H"),
     }
 
@@ -255,8 +263,8 @@ def evaluate_gpt_creative_scores(input_csv, llm_context, base_prompt, output_dir
 
     logging.info("🚀 Step 1: Sign only")
     scores_1, reason_1 = evaluate_all("")
-    logging.info("🚀 Step 2: Sign + caption_NH")
-    scores_2, reason_2 = evaluate_all("caption_NH")
+    logging.info("🚀 Step 2: Sign + caption_F")
+    scores_2, reason_2 = evaluate_all("caption_F")
     logging.info("🚀 Step 3: Sign + caption_H")
     scores_3, reason_3 = evaluate_all("caption_H")
 
@@ -267,20 +275,20 @@ def evaluate_gpt_creative_scores(input_csv, llm_context, base_prompt, output_dir
 
     print("\n📊 平均得分（0–100）:")
     print(f"Sign only         → Mean = {scores_1.mean():.2f}, Std = {scores_1.std():.2f}")
-    print(f"Sign + caption_NH → Mean = {scores_2.mean():.2f}, Std = {scores_2.std():.2f}")
+    print(f"Sign + caption_F  → Mean = {scores_2.mean():.2f}, Std = {scores_2.std():.2f}")
     print(f"Sign + caption_H  → Mean = {scores_3.mean():.2f}, Std = {scores_3.std():.2f}")
 
     print("\n📈 t检验（配对样本）:")
-    print("Sign vs NH:", ttest_rel(scores_1, scores_2))
+    print("Sign vs F :", ttest_rel(scores_1, scores_2))
     print("Sign vs H :", ttest_rel(scores_1, scores_3))
-    print("NH vs H   :", ttest_rel(scores_2, scores_3))
+    print("F vs H    :", ttest_rel(scores_2, scores_3))
 
     # 整合所有结果到一个 CSV 中
     result_df = df.copy()
     result_df["Score_Sign_only"] = scores_1
     result_df["Reasoning_Sign_only"] = reason_1
-    result_df["Score_caption_NH"] = scores_2
-    result_df["Reasoning_caption_NH"] = reason_2
+    result_df["Score_caption_F"] = scores_2
+    result_df["Reasoning_caption_F"] = reason_2
     result_df["Score_caption_H"] = scores_3
     result_df["Reasoning_caption_H"] = reason_3
 
@@ -293,4 +301,4 @@ def evaluate_gpt_creative_scores(input_csv, llm_context, base_prompt, output_dir
 
 
 if __name__ == "__main__":
-    print("Use `python main.py --config <config.yaml>` to run the HALO pipeline.")
+    print("Use `python main.py --config <config.yaml>` to run the HIVE pipeline.")

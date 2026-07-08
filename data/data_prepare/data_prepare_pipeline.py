@@ -143,8 +143,11 @@ def generate_captions(
 
 # 清洗无效样本
 def clean_dataframe(df):
-    #required_columns = ['Label', 'caption_H', 'caption_NH']
-    required_columns = ['caption_H', 'caption_NH']
+    if "caption_F" not in df.columns and "caption_NH" in df.columns:
+        df = df.copy()
+        df["caption_F"] = df["caption_NH"]
+
+    required_columns = ["caption_H", "caption_F"]
     df_cleaned = df.dropna(subset=required_columns)
     df_cleaned = df_cleaned[~df_cleaned[required_columns].astype(str).apply(lambda x: x.str.strip()).eq('').any(axis=1)]
     return df_cleaned
@@ -175,7 +178,7 @@ def run_pipeline(
     gpt_ctx = init_gpt_ctx(model, api_key, base_url,max_tokens,role_prompt,temperature)
     checkers = init_checkers(gpt_ctx)
 
-    print("🚀 Step 1: 生成 caption_H（幻觉描述）")
+    print("🚀 Step 1: Generating caption_H (hallucinated caption)")
     df = generate_captions(df, checkers, gpt_ctx,
                            prompt_template=prompt_template,
                            require_hallucination=True,
@@ -184,15 +187,15 @@ def run_pipeline(
                            max_attempts=max_attempts,
                            max_workers=max_workers)
 
-    print("🚀 Step 2: 生成 caption_NH（非幻觉描述）")
+    print("🚀 Step 2: Generating caption_F (faithful caption)")
     df = generate_captions(df, checkers, gpt_ctx,
                            prompt_template=prompt_template,
                            require_hallucination=False,
-                           #require_hallucination=True,
-                           column_name="caption_NH",
+                           column_name="caption_F",
                            validation_threshold=validation_threshold,
                            max_attempts=max_attempts,
                            max_workers=max_workers)
+    df["caption_NH"] = df["caption_F"]
 
     print("📝 Step 2.5: 保存未清理的数据")
     raw_output_path = output_path.replace(".csv", "_raw.csv")
@@ -208,4 +211,4 @@ def run_pipeline(
 
 
 if __name__ == "__main__":
-    print("Use `python main.py --config <config.yaml>` to run the HALO pipeline.")
+    print("Use `python main.py --config <config.yaml>` to run the HIVE pipeline.")
